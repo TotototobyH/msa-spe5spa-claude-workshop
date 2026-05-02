@@ -1,172 +1,227 @@
-# Module 6: Your own Telegram bot
+# Module 6: Your Own Telegram Bot
 
 **Time: 20 minutes**
 
-## The scenario
+## The Scenario
 
-So far the pipeline is:
+So far, the workflow still depends on you:
 
-1. Pat emails you the GPS file.
-2. *You* download it.
-3. *You* open Claude Code and ask for the report.
-4. *You* send the PDF back.
+1. Pat sends you the GPS file.
+2. You open Claude Code.
+3. You ask for the report.
+4. You send the PDF back.
 
-The bot removes you from steps 2-4. Pat sends the file to a Telegram chat; the bot receives it, runs the cleaning tool and the skill, and replies with the PDF.
+This module removes the middle steps. Pat sends the CSV to a Telegram bot. Claude Code receives the message through a channel plugin, runs the same cleaning and reporting workflow, and replies with the PDF.
 
-At the end of this module **you will have your own Telegram bot running in your Codespace**, with your own token, and only people you allow can talk to it.
+At the end of this module, you will have a Telegram bot running from your Codespace. Only people you allowlist can use it.
 
-## What is a Telegram bot?
+## What Is A Telegram Bot?
 
-A Telegram bot is just an account Telegram lets you register programmatically. It has a username (e.g. `@northfield_load_bot`) and a **token** - a long secret string that grants API access to post and receive messages as that bot. Anyone can create one. It is free.
+A Telegram bot is an account controlled by software. It has:
 
-The bot itself is just a program that:
+- a display name, such as `Northfield Load Bot`
+- a username ending in `bot`, such as `northfield_load_nf123_bot`
+- a token, which is the secret password that lets software act as the bot
 
-1. Polls Telegram for new messages sent to it.
-2. Reacts (sends replies, downloads attachments, runs actions).
+Claude Code does not magically live inside Telegram. Instead, we use **Claude Code Channels**. A channel plugin listens for new Telegram messages, passes them into your running Claude Code session, and gives Claude a tool for replying.
 
-In our case, the "program" is Claude Code with a small Telegram plugin that relays messages to and from Claude.
+That distinction matters: the bot only works while Claude Code is running with the Telegram channel enabled.
 
-## Step 1: make a bot with @BotFather
+## Step 1: Check The Required Tools
 
-On your phone, open Telegram and search for **@BotFather** (the real one, verified with a blue tick). Start a chat and send:
+From the repo root, run:
 
-```
-/newbot
-```
-
-BotFather will ask for:
-
-- **A name** for the bot (e.g. `Northfield Load Bot`). This is what appears in chat headers.
-- **A username** ending in `bot` (e.g. `northfield_load_NF123_bot`). Must be unique across all of Telegram - add your initials/numbers. Save the username; you will need it.
-
-BotFather replies with a message containing a token like:
-
-```
-7891234567:AAH...long-random-string
+```bash
+bun --version
+claude --version
+claude doctor
 ```
 
-**Treat this like a password.** Anyone who has it can impersonate your bot.
+The Telegram channel plugin needs Bun. The Codespace should install it automatically. If `bun --version` fails, stop and ask for help before creating a bot.
 
-## Step 2: store the token safely
+Then start Claude Code:
 
-In your Codespace terminal, from the repo root:
-
-```
-echo 'TELEGRAM_BOT_TOKEN=7891234567:AAH...your-token-here...' > .env
-```
-
-Replace the right-hand side with your actual token. The `.env` file is already in `.gitignore` so it will not be committed.
-
-Verify:
-
-```
-cat .env
-```
-
-You should see your token. Now check Git is ignoring it:
-
-```
-git status
-```
-
-`.env` should **not** appear. If it does, stop and tell the instructor.
-
-## Step 3: install the plugin
-
-In the terminal:
-
-```
-claude plugin install telegram
-```
-
-(If you get a prompt about permissions, accept.)
-
-Then register your token with the plugin:
-
-```
-claude telegram:configure
-```
-
-Follow the prompts. Paste the token when asked. The plugin will ping Telegram's API to confirm the token is valid and the bot exists.
-
-## Step 4: allowlist yourself
-
-By default the bot ignores everyone. You need to tell it who is allowed to message it.
-
-Open Telegram on your phone. Start a chat with your bot (search for its username, or tap the BotFather link). Send:
-
-```
-/start
-```
-
-Back in the Codespace terminal:
-
-```
-claude telegram:access
-```
-
-This shows a list of pending pairings. You should see your own Telegram user. Approve it. Now the bot will listen to you and ignore everyone else.
-
-## Step 5: start the bot
-
-```
+```bash
 claude
 ```
 
-Then at the Claude Code prompt:
+Inside Claude Code, check your account:
 
+```text
+/status
 ```
-Start listening on Telegram. When I send you a GPS CSV, run the weekly-load-report skill on it and reply with the PDF and a short summary.
+
+Claude Code requires Pro, Max, Team, Enterprise, or Console access. The free Claude.ai plan does not include Claude Code access. Plan names, prices, and limits can change, so check the current Claude plan page rather than assuming the cheapest option will support the whole workflow.
+
+## Step 2: Create A Bot With BotFather
+
+On your phone, open Telegram and search for **@BotFather**. Use the verified account with the blue tick.
+
+Send:
+
+```text
+/newbot
 ```
 
-You should see Claude acknowledge, and a line like `telegram:listen polling started`.
+BotFather asks for:
 
-## Step 6: test it from your phone
+- **Name:** this appears in chat headers, for example `Northfield Load Bot`.
+- **Username:** this must be unique and must end in `bot`, for example `northfield_load_nf123_bot`.
 
-On your phone, in the chat with your bot:
+BotFather replies with a token that looks like:
 
-- Send `hello`. The bot should reply with something sensible.
-- Send the file `data/gps_training_messy.csv` as an attachment. (From Codespaces, right-click the file and "Download" to get it on your phone, or AirDrop/email yourself. In the real workflow Pat sends it from wherever he is.)
+```text
+7891234567:AAH...long-random-string
+```
+
+Treat the token like a password. Anyone with it can act as your bot.
+
+## Step 3: Install The Telegram Channel Plugin
+
+In Claude Code, install the official Telegram plugin:
+
+```text
+/plugin install telegram@claude-plugins-official
+/reload-plugins
+```
+
+If Claude Code says the plugin cannot be found, refresh the official marketplace and retry:
+
+```text
+/plugin marketplace update claude-plugins-official
+/plugin install telegram@claude-plugins-official
+/reload-plugins
+```
+
+If the marketplace is still missing, add it and retry:
+
+```text
+/plugin marketplace add anthropics/claude-plugins-official
+/plugin install telegram@claude-plugins-official
+/reload-plugins
+```
+
+## Step 4: Configure The Token
+
+Still inside Claude Code, configure the bot token:
+
+```text
+/telegram:configure 7891234567:AAH...your-token-here...
+```
+
+Paste your real token in that command. The plugin stores it in Claude Code's local channel state, not in the Git repo.
+
+Do not paste the token into `README.md`, `CLAUDE.md`, a Python file, or a GitHub issue.
+
+## Step 5: Restart With The Telegram Channel Enabled
+
+Exit Claude Code:
+
+```text
+exit
+```
+
+Then restart it with the Telegram channel enabled:
+
+```bash
+claude --channels plugin:telegram@claude-plugins-official
+```
+
+You should see Claude Code start normally. This session is now listening for Telegram messages from your bot.
+
+## Step 6: Pair And Allowlist Yourself
+
+On your phone, open a chat with your new bot and send:
+
+```text
+hello
+```
+
+The bot should reply with a short pairing code.
+
+Back in Claude Code, run:
+
+```text
+/telegram:access pair <code>
+```
+
+Replace `<code>` with the code Telegram gave you.
+
+Now lock the bot down so only allowlisted users can talk to it:
+
+```text
+/telegram:access policy allowlist
+```
+
+This is the security step. Without it, the bot may keep offering pairing codes to people who discover the username.
+
+## Step 7: Give The Bot Its Job
+
+At the Claude Code prompt, send:
+
+```text
+When I send you a GPS CSV through Telegram, clean it using the Module 4 rules, run the weekly-load-report skill, and reply with the PDF plus a short summary for the coach.
+```
+
+Claude should acknowledge the workflow. If it asks for permission to read files or run commands, approve only the actions that match the report workflow.
+
+## Step 8: Test From Your Phone
+
+In Telegram:
+
+1. Send `hello`.
+2. Send `data/gps_training_messy.csv` as a file attachment. In Codespaces, you can right-click the file and download it to your computer or phone first.
+
+Send the CSV as a file/document, not as pasted text. Telegram messages are not a good place for raw CSV content.
 
 The bot should:
 
-1. Acknowledge receipt.
-2. Say what it is about to do ("cleaning, aggregating, compiling report").
-3. Reply with a PDF and a short text summary.
+- acknowledge the file
+- clean and aggregate the data
+- compile the Typst PDF
+- reply with the PDF and a short written summary
 
-Open the PDF on your phone. It should be the same standardised report you saw in Module 5.
+Open the PDF and check that it matches the standard report from Module 5.
 
-## What to do when it breaks
+## What To Do When It Breaks
 
-It will break at some point. Typical issues:
+It will break at some point. That is normal.
 
-- **Bot does not reply:** check the Codespace terminal. Is Claude Code still running? Has your Codespace paused (inactive > 30 min)? Restart it.
-- **"Not allowed":** you did not complete the allowlist step. Run `claude telegram:access` again.
-- **PDF is empty or missing rows:** you probably sent a file with a different column layout. Ask Claude to check the schema and tell you what is missing.
+| Problem | What to check |
+|---------|---------------|
+| Bot does not reply | Is Claude Code running with `claude --channels plugin:telegram@claude-plugins-official`? |
+| Pairing code never arrives | Did you configure the correct token from BotFather? Did you message the right bot username? |
+| Claude receives one message but not the next | Press Enter in the Claude Code terminal and check whether the session is waiting for input or permission. |
+| `Not allowed` or ignored messages | Run `/telegram:access pair <code>` again, then `/telegram:access policy allowlist`. |
+| PDF is missing or empty | Ask Claude to inspect the CSV schema and compare it with the Module 4 cleaning rules. |
+| Telegram says there is a conflict | Make sure the same bot token is not running in another Codespace or terminal. |
 
-## What you learned
+## What You Learned
 
-- A Telegram bot is a program that listens for messages and reacts.
-- Tokens are secrets. They live in `.env`, never in Git.
-- Claude Code + the Telegram plugin turns your skill into a phone-accessible service for your team.
-- Because this is running in your Codespace, it stops when the Codespace pauses. In production you would run it on a VPS so it stays up overnight.
+- Telegram bots are accounts controlled by tokens.
+- Tokens are secrets and must never be committed.
+- Claude Code Channels let external messages enter a running Claude Code session.
+- The bot works only while the channel-enabled Claude Code session is running.
+- Access control matters because a channel user can trigger work in your session.
 
-## Production notes (read this before you try it at work)
+## Production Notes
 
-Running the bot in a Codespace is fine for learning. For an actual club:
+Codespaces is fine for learning, but it pauses when inactive. A real club workflow would run on an always-on machine, usually a VPS or a club-controlled server.
 
-- Use a **VPS** (DigitalOcean, Hetzner, an always-on Mac mini on the network). £5-10/month.
-- Use a **paid Claude plan** - Pro minimum; Max or Enterprise if the bot is handling real volume.
-- Put the bot in a **Docker container** with the plugin's allowlist baked in. Claude Code has a `claude docker` wrapper that makes this easy.
-- Review the **Anthropic data policy** with your club's data officer before connecting to anything with real athlete data.
-- Consider a **local LLM** via Ollama for the most sensitive workflows where data cannot leave the club's infrastructure. Slower but fully private.
+Before using this pattern with real athlete data, you would also need:
+
+- a paid Claude setup with enough usage for the workload
+- a data governance review
+- clear allowlists for staff accounts
+- logging and monitoring
+- a plan for what happens when the bot fails
 
 ## Done
 
-You have a live Telegram bot. That is remarkable. Twenty minutes ago you had never started Claude Code.
+You have connected a phone chat to a repeatable sport analytics workflow.
 
-Module 7 extends this with a second bot for coach-facing comms. It is optional and runs as post-class extension material.
+Module 7 shows why you might run more than one bot.
 
-```
+```bash
 cd /workspaces/msa-spe5spa-claude-workshop/module-7-multi-bot
 ```

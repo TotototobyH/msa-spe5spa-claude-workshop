@@ -14,6 +14,15 @@ sudo ln -sf /opt/typst-x86_64-unknown-linux-musl/typst /usr/local/bin/typst
 rm /tmp/typst.tar.xz
 typst --version
 
+echo "==> Installing Bun (for Claude Code channel plugins)"
+if ! command -v unzip >/dev/null 2>&1; then
+  sudo apt-get update
+  sudo apt-get install -y unzip
+fi
+curl -fsSL https://bun.sh/install | bash
+sudo ln -sf "$HOME/.bun/bin/bun" /usr/local/bin/bun
+bun --version
+
 echo "==> Installing Claude Code CLI"
 curl -fsSL https://claude.ai/install.sh | bash || true
 

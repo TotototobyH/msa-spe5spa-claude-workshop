@@ -1,152 +1,198 @@
-# Module 7: Multi-bot ecosystem (extension)
+# Module 7: Multi-Bot Ecosystem
 
-**Time: 15 minutes · optional, post-class**
+**Time: 15 minutes - optional extension**
 
-## Why another bot?
+## Why Another Bot?
 
-Your load-bot from Module 6 answers to you and Pat. That is the right audience for the raw training-load report. But a real high-performance team has other audiences with very different needs:
+Your load bot from Module 6 is for people who need the technical report: Pat, the sport scientist, and the S&C lead. It can use GPS language, send PDFs, and include player-level tables.
 
-| Audience | What they want | How often |
-|----------|----------------|-----------|
-| Head coach | One-page PDF, traffic-light flags | weekly |
-| S&C lead | Detailed player-level session data, thresholds, prescription suggestions | every session |
-| Academy director / board | Squad-level trend narrative, monthly KPIs, no tactics | monthly |
-| Parents of U16s | Short text update on their child's wellness and involvement | fortnightly |
+That is not the same as a coach update.
 
-If you put all four audiences into one bot, the bot ends up muddled and every message needs a "who are you?" clarification. The professional pattern is **one bot per audience**, each with its own persona, scope, and skillset.
+Different people at a club need different outputs:
 
-This module adds a second bot - the **coach-comms bot** - that takes the same underlying data and produces a short tactical narrative for the head coach, phrased for a human who has ten seconds to read it on the sideline.
+| Audience | What they need | Good bot behaviour |
+|----------|----------------|--------------------|
+| S&C lead | Player-level load, spikes, and thresholds | Technical, detailed, happy to send PDFs |
+| Head coach | A fast read before training | Brief, direct, no unnecessary tables |
+| Academy director | Monthly trend and risk narrative | Squad-level, low jargon, board-safe |
+| Parents of U16s | Opt-in wellbeing and involvement updates | Carefully worded, no private medical claims |
+| Recruitment staff | Talent ID combine summaries | Searchable, comparison-focused, no coaching chatter |
 
-## Architecture
+If one bot tries to serve every audience, it has to ask "who am I talking to?" before almost every useful answer. A cleaner pattern is **one bot per audience**, each with its own context, permissions, and skill scope.
 
-```
-                          [ shared data/ folder ]
-                                    │
-          ┌─────────────────────────┼─────────────────────────┐
-          │                         │                         │
-    load-bot/CLAUDE.md      comms-bot/CLAUDE.md        (future bots...)
-          │                         │
-    weekly-load-report        coach-brief skill
-    skill (PDFs)              (short text + emoji)
-          │                         │
-    Telegram: Pat             Telegram: Head coach
-    & S&C staff               + Assistant coach
-```
+## The Pattern
 
-Both bots share the same project folder and the same data. They differ in **who they answer to** and **which skills they invoke**.
-
-## Step 1: register a second bot with BotFather
-
-Same as Module 6. Use `/newbot` again. Name it something like `Northfield Coach Brief Bot`, username `northfield_coach_NF123_bot`. Save the token.
-
-## Step 2: add it to `.env`
-
-Open `.env` and add a second line:
-
-```
-TELEGRAM_BOT_TOKEN=... (your load-bot token from Module 6)
-TELEGRAM_COMMS_TOKEN=... (your new coach-brief token)
+```text
+shared repo + data + skills
+        |
+        +-- load-bot context   -> weekly-load-report skill -> PDF for technical staff
+        |
+        +-- comms-bot context  -> coach-brief skill        -> short message for coaches
+        |
+        +-- future bot context -> future skill             -> audience-specific output
 ```
 
-## Step 3: wire the comms-bot
+The data can be the same. The model can be the same. The output changes because the bot is given different context and a different job.
 
-Each bot gets its own sub-folder with its own `CLAUDE.md`:
+Open these files and compare them:
 
-```
-module-7-multi-bot/
-├── load-bot/CLAUDE.md    (already written - read this for reference)
-└── comms-bot/CLAUDE.md   (already written)
-```
-
-Open both and compare. Notice how they differ:
-
-- **load-bot** is technical: talks to S&C staff, uses jargon, defaults to full PDFs.
-- **comms-bot** is brief: talks to the head coach, uses short sentences, avoids raw numbers where a traffic-light would do, uses (sparingly) emoji because the coach reads on his phone between sessions.
-
-This is the key pattern. **Context shapes behaviour.** Same model, same data, different CLAUDE.md → different personality.
-
-## Step 4: configure the second plugin instance
-
-```
-claude telegram:configure --profile comms --token-env TELEGRAM_COMMS_TOKEN
+```bash
+cat module-7-multi-bot/load-bot/CLAUDE.md
+cat module-7-multi-bot/comms-bot/CLAUDE.md
 ```
 
-This registers the second bot under a profile named `comms`. The load-bot runs under the default profile.
+Notice the differences:
 
-## Step 5: allowlist the coach
+- `load-bot` speaks to technical staff and defaults to report detail.
+- `comms-bot` speaks to the head coach and defaults to short, decision-ready language.
+- Both are grounded in the same Northfield FC project.
 
-On your phone, from a test account representing the head coach (or ask a classmate to help), send `/start` to the new bot. Then:
+That is the lesson: **context shapes behaviour**.
 
+## Step 1: Create A Second Telegram Bot
+
+Use BotFather again:
+
+```text
+/newbot
 ```
-claude telegram:access --profile comms
+
+Give the second bot a coach-facing name, for example:
+
+- Name: `Northfield Coach Brief Bot`
+- Username: `northfield_coach_nf123_bot`
+
+Save the token. It is a separate secret from the load bot token.
+
+## Step 2: Keep State Separate
+
+The Telegram channel plugin stores token and allowlist state locally. For two bots on one machine, use separate state directories so the tokens and allowlists do not overwrite each other.
+
+If your Module 6 load bot is already running, leave it alone. It can keep using the default Telegram state directory.
+
+For a clean two-bot setup, configure each bot from a terminal that has its own `TELEGRAM_STATE_DIR`. For the load bot:
+
+```bash
+export TELEGRAM_STATE_DIR="$HOME/.claude/channels/telegram-load"
+claude
 ```
 
-Approve.
+Then, inside Claude Code:
 
-## Step 6: build the `coach-brief` skill
-
-The skill is already scaffolded at `skills/coach-brief/SKILL.md`. Read it. It expects the same cleaned GPS data but produces a totally different output: a 3-sentence message, no PDF, no tables. Just "squad did X, Y was high, Z to watch on Friday".
-
-Start Claude Code and ask:
-
+```text
+/plugin install telegram@claude-plugins-official
+/reload-plugins
+/telegram:configure 7891234567:AAH...load-bot-token...
+exit
 ```
+
+Restart it with the same state directory and the channel enabled:
+
+```bash
+export TELEGRAM_STATE_DIR="$HOME/.claude/channels/telegram-load"
+claude --channels plugin:telegram@claude-plugins-official
+```
+
+For the coach comms bot, open a second terminal:
+
+```bash
+export TELEGRAM_STATE_DIR="$HOME/.claude/channels/telegram-comms"
+claude
+```
+
+Each terminal runs one bot session. Each state directory needs its own token configuration and allowlist pairing.
+
+## Step 3: Configure The Comms Bot
+
+In the second Claude Code session, install/reload the plugin if needed:
+
+```text
+/plugin install telegram@claude-plugins-official
+/reload-plugins
+```
+
+Configure the coach bot token:
+
+```text
+/telegram:configure 7891234567:AAH...coach-bot-token...
+```
+
+Restart the second session with the same state directory:
+
+```bash
+export TELEGRAM_STATE_DIR="$HOME/.claude/channels/telegram-comms"
+claude --channels plugin:telegram@claude-plugins-official
+```
+
+Message the coach bot from Telegram, then pair and lock it down:
+
+```text
+/telegram:access pair <code>
+/telegram:access policy allowlist
+```
+
+## Step 4: Give The Comms Bot Its Role
+
+At the Claude Code prompt for the comms bot, send:
+
+```text
+Use the comms-bot context in module-7-multi-bot/comms-bot/CLAUDE.md. When I ask for the weekly coach brief, use the coach-brief skill and reply with a short coach-facing message only. No PDF unless I explicitly ask for one.
+```
+
+Then test the skill in the terminal before using Telegram:
+
+```text
 Produce the coach brief for this week using the coach-brief skill.
 ```
 
-Verify the output in the terminal. If it is too long, iterate - brevity is the whole point.
+If the answer is too long, tell Claude to tighten it. The whole point of this bot is that the coach can read it quickly.
 
-## Step 7: start both bots
+## Step 5: Compare The Two Bots
 
-In one terminal:
+Send a similar request to each bot:
 
-```
-claude
-> Start the load-bot listening on Telegram.
-```
-
-In a second terminal tab (`+` in VS Code's terminal panel):
-
-```
-claude --profile comms
-> Start the comms-bot listening on Telegram.
+```text
+weekly report
 ```
 
-Now send `weekly report` to the load-bot. You get a PDF. Send the same thing to the comms-bot. You get a three-sentence brief. Same data, two outputs, two audiences. No context-switching effort from you.
+Expected result:
 
-## What this unlocks
+| Bot | Expected output |
+|-----|-----------------|
+| Load bot | PDF report plus short technical summary |
+| Coach comms bot | Three-sentence coach brief, no PDF |
 
-Once you have this pattern, the list of bots is bounded only by how many audiences your team has. Realistic production set for a professional club:
+Same project. Same data. Different audience.
 
-- **Load-bot** (S&C staff) - weekly load PDFs, per-session flags
-- **Comms-bot** (head coach + assistants) - 3-line briefs
-- **Board-bot** (academy director) - monthly KPI one-pager
-- **Parent-bot** (parents, opt-in) - fortnightly wellness and involvement note
-- **Scouting-bot** (recruitment staff) - talent-ID combine data on demand
+## Why This Matters
 
-Each one is a folder with a CLAUDE.md, optional skills, and a Telegram profile. Adding a new one is 30 minutes of work, not a week.
+In a real club, the danger is not only bad data. It is the right data sent to the wrong audience in the wrong form.
 
-## The budget conversation
+The S&C lead may want thresholds and player-level detail. The head coach may want three clear sentences. Parents may need careful wording and a much narrower scope. A board report may need trends without tactical detail.
 
-If you are reading this and thinking "I want to take this to my club", here is the rough cost model to put in front of a director of performance:
+Separate bots make those boundaries visible:
 
-- **Infrastructure (VPS):** £10/month
-- **Claude subscription:** Claude Max at ~£80-150/month per analyst seat, or Claude for Enterprise for team-level access. Budget one seat for the analyst who owns the bots.
-- **Telegram:** free
-- **Typst:** free
+- **Scope:** what the bot is allowed to answer
+- **Tone:** how the bot speaks to its audience
+- **Permissions:** who can trigger the bot
+- **Outputs:** whether it sends PDFs, short messages, or summaries
+- **Safety:** what it should refuse or redirect
 
-Versus the analyst time you save:
+## Production Notes
 
-- Weekly load report: ~1 hour × 40 training weeks = 40 hours/year
-- Coach brief: ~30 min × 40 = 20 hours/year
-- Board report: ~2 hours × 12 = 24 hours/year
-- Parent updates: ~1 hour × 20 = 20 hours/year
+For a real deployment, do not run long-lived club bots from a class Codespace. Use an always-on environment and document:
 
-That is roughly **100 hours/year saved per analyst**, for a few hundred pounds of subscriptions. The ROI conversation is short.
+- who owns each bot
+- who is on each allowlist
+- which data each bot can access
+- what each bot is allowed to send
+- how tokens are rotated
+- what to do when the bot gives an unexpected answer
 
-The real win is not the time. It is that the report gets written **every single week**, even the weeks when the analyst is at a tournament, sick, or on leave. Institutional reliability is the thing the subscription buys.
+The technical setup is only half the work. The professional work is deciding who should receive which information, in what form, and with what safeguards.
 
 ## Done
 
-You built two bots. You could now build twenty. The end.
+You now have the pattern for an analyst-owned bot ecosystem: one shared workflow, multiple audience-specific front doors.
 
-Return to `README.md` at the repo root for recap.
+Return to the root README for the workshop recap.

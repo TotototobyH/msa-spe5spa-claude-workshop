@@ -18,16 +18,28 @@ cleaned_*.csv
 # Typst cache
 .typst-cache/
 
-# Claude Code local state
+# Assistant local state and private control files
 .claude/
 !.claude/settings.json
 !.claude/skills/
+.codex/
+AGENTS.md
+**/AGENTS.md
 
 # Bot tokens and secrets (NEVER commit these)
 .env
 .env.*
 *.token
 telegram-token.txt
+
+# Local instructor-only material (keep out of the student-facing repo)
+.instructor/
+instructor-notes/
+recording-notes/
+rehearsal-notes/
+*_instructor_notes.md
+*_recording_plan.md
+*_run_sheet.md
 
 # OS files
 .DS_Store

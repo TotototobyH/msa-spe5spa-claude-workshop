@@ -4,59 +4,96 @@
 **Subject:** SPE5SPA - Sports Project A
 **Session:** Week 8, Wednesday AM (29 April 2026)
 
-Welcome. Over the next ninety minutes (and a bit more in your own time) you will go from "I have never touched a terminal" to "I have my own Telegram bot that reads a GPS export, runs quality checks, and produces a standardised PDF training-load report for my coach."
+This workshop is a practical first pass at using Claude Code in a sport analytics workflow. You will start in the terminal, work through a messy GPS export, turn that process into a repeatable report, and finish with a Telegram bot that can receive a file and send back a coach-ready PDF.
 
-You are building something that real performance analysts in soccer academies, academy systems, and high-performance units use every week. We are using synthetic data and a toy scenario, but the shape of the workflow is real.
+The data is synthetic. The workflow is deliberately small. The pattern is real.
 
-## The scenario you are building for
+## The Lesson
 
 You work as a performance analyst at **Northfield FC**, a fictional academy-level soccer club.
 
-- Your sport scientist, Pat, runs on-field GPS units during every training session. After the session, Pat exports a CSV from the GPS vendor's software.
-- That CSV lands in your hands. Some fields are messy. Some sessions have dropped units. You need to sanity-check it, roll it up into weekly totals per player, flag anyone whose load is spiking, and send a one-page report to the head coach before the next morning.
-- Today, Pat does this by sending you the file in WhatsApp at 9pm. You do it by hand and email a spreadsheet back at 11pm.
-- By the end of this workshop, Pat sends the file to **your** Telegram bot. The bot cleans it, scores it, flags the risky spikes, renders a PDF, and sends it back to the coach - in the time it took you to read this paragraph.
+Pat, the sport scientist, exports GPS data after training. The file is messy: dates are inconsistent, session names do not match, some GPS units drop fields, and a few rows are clearly wrong. Your job is to build a workflow that checks the file, cleans it, rolls it up, flags load spikes, and produces a standard weekly report.
 
-Every module in this workshop exists to build one piece of that pipeline.
+By the end, Pat can send the CSV to a Telegram bot. Claude Code receives it, runs the cleaning/reporting workflow, and replies with a PDF and a short summary.
 
-## What you need before the session
+## What You Will Learn
 
-- A **GitHub account** (free - github.com/signup)
-- A **Claude account with paid access**: either a Claude Pro or Max subscription, or Claude Console API credits. The free tier will not carry you through Modules 4-7.
-- A phone with **Telegram** installed (Modules 6 and 7). Any recent iPhone/Android works.
+| # | Module | Purpose | What you do | What you produce | Time |
+|---|--------|---------|-------------|------------------|------|
+| 1 | Terminal basics | Get comfortable moving around a code project | Use `pwd`, `ls`, `cd`, `head`, `grep`, and `git status` | Confidence using the terminal without guessing where you are | 10 min |
+| 2 | First Claude Code conversation | Understand Claude Code as an agent, not just chat | Start Claude Code, ask it to inspect files, watch tool calls | A clear mental model of tools, files, commands, and limits | 15 min |
+| 3 | `CLAUDE.md` and context | Learn how stable project context changes Claude's behaviour | Read the project `CLAUDE.md`, then write a small module-level one | A context file that tells Claude who you are and what "done" means | 10 min |
+| 4 | Build a GPS cleaning tool | Turn messy sport data into a deterministic process | Ask Claude to inspect the CSV, agree cleaning rules, review and run the script | `clean_gps.py` and a cleaned GPS CSV | 20 min |
+| 5 | Automate the weekly report | Use a skill and Typst template for repeatable reporting | Invoke the weekly-load-report skill and compile a PDF | A one-page Northfield FC training-load report | 20 min |
+| 6 | Telegram bot | Put the report workflow behind a phone chat | Create a bot, configure Claude Code Channels, allowlist yourself, send a CSV | A Telegram bot that returns the report PDF | 20 min |
+| 7 | Multi-bot extension | Separate audiences by bot, context, and skill | Compare load-bot and comms-bot roles, then test a second audience-specific brief | A pattern for coach, S&C, board, or parent-facing bots | 15 min |
 
-A full student-facing prep guide is in the LMS announcement you received three days before class. If you did not see it, flag on Teams.
+## Why These Tools?
 
-## Modules
+We use **GitHub Codespaces** so everyone starts from the same environment, but the bigger reason is safety. Claude Code can read files, run commands, edit code, and use tools inside a workspace. That is useful, but it is not something you should first try in a personal laptop folder full of unrelated documents, browser sessions, SSH keys, cloud-sync folders, and private files.
 
-| # | Module | What you learn | Time |
-|---|--------|----------------|------|
-| 1 | Terminal basics | Move around, peek at files, use Git | 10 min |
-| 2 | Your first Claude Code conversation | What Claude Code is, how it differs from the chat interface, what "tools" and "agents" mean | 15 min |
-| 3 | CLAUDE.md and giving context | How to tell Claude about your project so it stops guessing | 10 min |
-| 4 | Build a data cleaning tool | Work with Claude to clean messy GPS data | 20 min |
-| 5 | Automate the weekly report | Introduce **Skills**; build a Typst-powered training-load PDF | 20 min |
-| 6 | Your own Telegram bot | Wire the skill to a bot Pat can message | 20 min |
-| 7 | Multi-bot ecosystem (extension) | Add a second bot for coach/board comms | 15 min |
+Codespaces keeps this workshop inside a repo-specific cloud development environment. You can make mistakes, run commands, and test the bot workflow without giving the agent broad access to your own computer. It is not the production setup a club would run forever, but it gives us a safer and more consistent learning boundary.
 
-Modules 1-5 run live during the 90-minute session. Modules 6-7 are walked through at the end; you will usually complete them either at the end of the session or in the following week.
+We use **Claude Code** because it can work inside the project: it can read files, edit scripts, run commands, use skills, and check its own output. The point is not to stop thinking. The point is to move from typing every line yourself to directing, reviewing, and verifying the work.
 
-## How to start
+We use **Skills** because a sport analytics team needs repeatable workflows. A weekly report should not depend on which analyst happened to be on shift.
+
+We use **Claude Code Channels with Telegram** because the final workflow should feel like the way staff already communicate. Pat sends a file from his phone; the system replies with the report.
+
+## What You Need Before Class
+
+- A **GitHub account**: <https://github.com/signup>
+- A **Claude account that can use Claude Code**. Claude Code requires Pro, Max, Team, Enterprise, or Console access; the free Claude.ai plan does not include Claude Code access. Check the current Claude plan details before class because prices and plan features can change.
+- A phone with **Telegram** installed for Modules 6 and 7.
+
+Useful current references:
+
+- Claude Code setup: <https://code.claude.com/docs/en/getting-started>
+- Claude Code Channels: <https://code.claude.com/docs/en/channels>
+- Claude plan guide: <https://support.claude.com/en/articles/11049762-choosing-a-claude-plan>
+
+Optional background reading:
+
+- [OpenClaw context and why we are not using it here](background/openclaw-context.md)
+
+## Start Here
 
 1. Click the green **Code** button at the top of this repo.
 2. Select the **Codespaces** tab.
-3. Click **Create codespace on main**.
-4. Wait roughly 90 seconds. A VS Code editor opens in your browser, and a terminal pane appears at the bottom. You will see "Installing Python libraries", "Installing Typst", "Installing Claude Code CLI" scroll past. This only happens the first time.
-5. When you see a `$` prompt, you are ready. Open `module-1-terminal/README.md` in the editor and start reading.
+3. If this is your first time, click the **+** button or **Create codespace on main**. If you already see a named Codespace such as `sturdy tribble`, that is an existing workspace; click it only if you want to continue where you previously left off.
+4. Check the billing message. It should show your own GitHub account or your organisation's approved billing account. If it says the instructor's name, stop and ask before creating the Codespace.
+5. Creating a Codespace gives you your own cloud workspace. It does not change the instructor's Codespace or modify the repo's `main` branch by itself.
+6. Wait for the setup to finish. The first launch installs Python libraries, R libraries, Typst, Bun, and Claude Code.
+7. When the terminal prompt appears, run:
 
-## Folder structure
-
+```bash
+claude --version
+claude doctor
 ```
+
+8. Start Claude Code:
+
+```bash
+claude
+```
+
+9. Inside Claude Code, run:
+
+```text
+/status
+```
+
+If Claude Code says your account does not have access, stop there and ask for help. Do not wait until Module 4 to discover that your plan is blocking you.
+
+## Folder Structure
+
+```text
 msa-spe5spa-claude-workshop/
 ├── .devcontainer/         # Codespace build config
-├── CLAUDE.md              # Shared project instructions Claude reads first
-├── data/                  # Synthetic scenario datasets
-├── skills/                # Reusable skills Claude can invoke (Module 5+)
+├── CLAUDE.md              # Shared project context for Claude Code
+├── background/            # Optional context readings
+├── data/                  # Synthetic Northfield FC datasets
+├── skills/                # Reusable Claude Code skills
 ├── module-1-terminal/
 ├── module-2-first-chat/
 ├── module-3-claude-md/
@@ -66,20 +103,29 @@ msa-spe5spa-claude-workshop/
 └── module-7-multi-bot/
 ```
 
-Each module folder has a `README.md` with the walkthrough, plus a local `CLAUDE.md` from Module 3 onwards that teaches context layering.
+Every module folder has its own `README.md`. From Module 3 onwards, some folders also have a local `CLAUDE.md` so you can see how context changes behaviour.
 
-## About the infrastructure choice
+## Safety Rules
 
-We are using **GitHub Codespaces** for this workshop. This is not the production setup you would run in a club. In a real high-performance team you would host your Claude Code + bot on a **cheap VPS** (DigitalOcean, Hetzner, a spare Mac mini on the club's network) so the bot stays running overnight when Codespaces would have paused.
+- Tokens, passwords, and API keys never go in Git.
+- `.env` is ignored already. Use it for local secrets.
+- Player IDs are synthetic (`NF###`). Do not paste real athlete data into this repo.
+- Reports are generated artefacts. They are useful outputs, but they do not need to be committed.
 
-Codespaces is the teaching-friendly shortcut. The workflow you learn here transfers exactly - the VPS setup is the same commands run on a different box.
+## After The Workshop
 
-## About Claude plans
+Codespaces is a teaching environment. A real club bot should run on an always-on controlled machine, not on an analyst's everyday laptop.
 
-Some features in this workshop - particularly running agents for longer tasks in Modules 4-7 - will hit the limits of the free Claude plan. You need **at least Claude Pro** to get through the full session comfortably. In a professional setting, your club would pay for a **Claude Max** or **Claude for Enterprise** subscription; the cost (roughly a fraction of one staff salary) is repaid in hours of analyst time per week.
+A **VPS** means **virtual private server**. In plain English, it is a computer you rent on the internet. It usually runs Linux, often Ubuntu LTS, and you connect to it remotely through a terminal using SSH. For a bot workflow, you clone the repo there, install the tools, store the bot token as a secret, and keep the bot running from that server.
 
-We will come back to this at the end of Module 7 with concrete numbers you can take to a director of performance.
+Good production options include:
 
----
+- a **VPS** such as DigitalOcean Droplets, Hetzner Cloud, Akamai Linode, Vultr Cloud Compute, or AWS Lightsail
+- an organisation-approved cloud VM such as Azure Virtual Machines or Google Cloud Compute Engine
+- a club-controlled **Mac mini**
+- a club-controlled **Linux server**
+- an internal university, institute, or club server managed by IT
 
-Ready? Open `module-1-terminal/README.md`.
+The point is isolation. The machine should contain only the project files, packages, secrets, and data needed for the workflow. It should not contain your personal downloads, unrelated projects, browser sessions, cloud-sync folders, or private SSH keys.
+
+Production adds extra work: access control, monitoring, backups, token rotation, data governance, and a clear policy for athlete information.

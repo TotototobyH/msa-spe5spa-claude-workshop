@@ -34,7 +34,11 @@ For a Northfield FC analyst, this turns a 45-minute cleaning chore into a 5-minu
 
 ## Setup: authenticate Claude Code
 
-Your Codespace already has the Claude Code CLI installed. You need to connect it to your account.
+Your Codespace already has the Claude Code CLI installed. You do not need to install Claude Code yourself in this workshop.
+
+If you later install it on your own computer or on a VPS, use the official setup docs, not a random blog or copied command: <https://code.claude.com/docs/en/getting-started>.
+
+For this workshop, your job is to connect the installed CLI to an account that can use Claude Code.
 
 If `claude` returns `command not found`, the Codespace setup did not finish or the CLI was not added to the terminal path. Run:
 
@@ -47,6 +51,23 @@ claude --version
 
 If that still fails, rebuild the Codespace or ask for help before continuing.
 
+### Which authentication option should I choose?
+
+When you run `claude` for the first time, Claude Code may offer more than one way to authenticate.
+
+For this workshop, use this decision rule:
+
+| If you have... | Choose this |
+|----------------|-------------|
+| A Claude Pro or Max account | Log in with your Claude.ai account in the browser |
+| Access through Claude Team or Enterprise | Log in with the Claude.ai account your organisation invited |
+| Access through Claude Console or an API key | Use the Console/API option only if your instructor or organisation gave you that setup |
+| Amazon Bedrock, Google Vertex AI, or Microsoft Foundry access | Use only if your organisation explicitly told you to use that provider |
+
+Most students should choose the browser login with their Claude account.
+
+Do **not** paste API keys, tokens, or passwords into a README, a Python file, a chat message, or GitHub. If you have been given API-based access, ask before entering any key.
+
 ### 3.1 Start Claude Code
 
 In the terminal, at the repo root:
@@ -56,6 +77,8 @@ claude
 ```
 
 The first time you run this, Claude Code will ask you to authenticate. A URL appears. Click it (Ctrl+click), sign in to your Claude account in the browser, copy the code it gives you back to the terminal, and press Enter.
+
+If the browser does not open automatically, Claude Code should give you a URL you can copy. In Codespaces, that is normal: the login is happening from a cloud development environment, not directly from your laptop.
 
 If you see `> ` (an input prompt inside a box), you are in. Type `exit` and press Enter to leave - we will come back in a moment.
 

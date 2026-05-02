@@ -4,9 +4,7 @@
 **Subject:** SPE5SPA - Sports Project A
 **Session:** Week 8, Wednesday AM (29 April 2026)
 
-This workshop is a practical first pass at using Claude Code in a sport analytics workflow. You will start in the terminal, work through a messy GPS export, turn that process into a repeatable report, and finish with a Telegram bot that can receive a file and send back a coach-ready PDF.
-
-The data is synthetic. The workflow is deliberately small. The pattern is real.
+This workshop is a practical first pass at using Claude Code in a sport analytics workflow. You will start in the terminal, work through a messy GPS export, turn that process into a repeatable report, and finish with a phone-fronted analyst agent that can receive a file and send back a coach-ready PDF.
 
 ## The Lesson
 
@@ -14,7 +12,9 @@ You work as a performance analyst at **Northfield FC**, a fictional academy-leve
 
 Pat, the sport scientist, exports GPS data after training. The file is messy: dates are inconsistent, session names do not match, some GPS units drop fields, and a few rows are clearly wrong. Your job is to build a workflow that checks the file, cleans it, rolls it up, flags load spikes, and produces a standard weekly report.
 
-By the end, Pat can send the CSV to a Telegram bot. Claude Code receives it, runs the cleaning/reporting workflow, and replies with a PDF and a short summary.
+By the end, Pat can send the CSV through Telegram and get help from something that behaves less like a normal chatbot and more like a junior sport analyst: it receives the file, checks it, cleans it, runs the report workflow, and replies with a PDF and a short summary.
+
+That is the bigger idea behind the workshop. The first version is one small analyst focused on GPS reporting. Over time, the same pattern could become a small team of specialist analyst agents: one for training load, one for coach briefings, one for wellness, one for talent ID, and one for operations. In a real organisation, access to a service like Claude should ideally be paid for and governed by the organisation, not improvised through individual student or staff accounts.
 
 ## What You Will Learn
 
@@ -25,8 +25,8 @@ By the end, Pat can send the CSV to a Telegram bot. Claude Code receives it, run
 | 3 | `CLAUDE.md` and context | Learn how stable project context changes Claude's behaviour | Read the project `CLAUDE.md`, then write a small module-level one | A context file that tells Claude who you are and what "done" means | 10 min |
 | 4 | Build a GPS cleaning tool | Turn messy sport data into a deterministic process | Ask Claude to inspect the CSV, agree cleaning rules, review and run the script | `clean_gps.py` and a cleaned GPS CSV | 20 min |
 | 5 | Automate the weekly report | Use a skill and Typst template for repeatable reporting | Invoke the weekly-load-report skill and compile a PDF | A one-page Northfield FC training-load report | 20 min |
-| 6 | Telegram bot | Put the report workflow behind a phone chat | Create a bot, configure Claude Code Channels, allowlist yourself, send a CSV | A Telegram bot that returns the report PDF | 20 min |
-| 7 | Multi-bot extension | Separate audiences by bot, context, and skill | Compare load-bot and comms-bot roles, then test a second audience-specific brief | A pattern for coach, S&C, board, or parent-facing bots | 15 min |
+| 6 | Analyst agent on Telegram | Put the report workflow behind a phone chat | Create a bot, configure Claude Code Channels, allowlist yourself, send a CSV | A junior analyst-style agent that returns the report PDF | 20 min |
+| 7 | Multi-agent extension | Separate audiences by bot, context, and skill | Compare load-bot and comms-bot roles, then test a second audience-specific brief | A pattern for coach, S&C, board, or parent-facing analyst agents | 15 min |
 
 ## Why These Tools?
 
@@ -38,12 +38,12 @@ We use **Claude Code** because it can work inside the project: it can read files
 
 We use **Skills** because a sport analytics team needs repeatable workflows. A weekly report should not depend on which analyst happened to be on shift.
 
-We use **Claude Code Channels with Telegram** because the final workflow should feel like the way staff already communicate. Pat sends a file from his phone; the system replies with the report.
+We use **Claude Code Channels with Telegram** because the final workflow should feel like the way staff already communicate. Pat sends a file from his phone; the analyst agent replies with the report. Telegram is the front door; Claude Code is the project-aware analyst doing the work behind it.
 
 ## What You Need Before Class
 
 - A **GitHub account**: <https://github.com/signup>
-- A **Claude account that can use Claude Code**. Claude Code requires Pro, Max, Team, Enterprise, or Console access; the free Claude.ai plan does not include Claude Code access. Check the current Claude plan details before class because prices and plan features can change.
+- A **Claude account that can use Claude Code**. Claude Code requires Pro, Max, Team, Enterprise, or Console access; the free Claude.ai plan does not include Claude Code access. Check the current Claude plan details before class because prices and plan features can change. In a real club or organisation, this should ideally be handled as an organisation-paid and governed service rather than a personal workaround.
 - A phone with **Telegram** installed for Modules 6 and 7.
 
 Useful current references:

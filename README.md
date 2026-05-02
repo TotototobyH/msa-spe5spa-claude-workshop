@@ -69,6 +69,7 @@ Optional background reading:
    - The Explorer panel may show the files before setup has finished. That does not mean Claude Code is ready yet.
    - Do not run `claude` until the setup has finished and you have a normal terminal prompt again.
    - If setup is still printing package-install messages, let it continue.
+   - When setup is complete, you should see lines like `Claude Code successfully installed!`, `Installation complete!`, a Claude Code version number, and `Outcome: success`.
 7. When the terminal prompt appears, run:
 
 ```bash

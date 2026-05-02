@@ -71,6 +71,17 @@ claude --version
 claude doctor
 ```
 
+If `claude` says `command not found`, the Codespace setup did not finish or the CLI was not added to the terminal path. Run:
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+source ~/.bashrc 2>/dev/null || true
+export PATH="$HOME/.local/bin:$HOME/.claude/local:$PATH"
+claude --version
+```
+
+If that still does not work, rebuild the Codespace or ask for help before continuing.
+
 8. Start Claude Code:
 
 ```bash

@@ -36,6 +36,17 @@ For a Northfield FC analyst, this turns a 45-minute cleaning chore into a 5-minu
 
 Your Codespace already has the Claude Code CLI installed. You need to connect it to your account.
 
+If `claude` returns `command not found`, the Codespace setup did not finish or the CLI was not added to the terminal path. Run:
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+source ~/.bashrc 2>/dev/null || true
+export PATH="$HOME/.local/bin:$HOME/.claude/local:$PATH"
+claude --version
+```
+
+If that still fails, rebuild the Codespace or ask for help before continuing.
+
 ### 3.1 Start Claude Code
 
 In the terminal, at the repo root:

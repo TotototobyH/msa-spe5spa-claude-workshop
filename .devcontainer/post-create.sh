@@ -24,6 +24,29 @@ sudo ln -sf "$HOME/.bun/bin/bun" /usr/local/bin/bun
 bun --version
 
 echo "==> Installing Claude Code CLI"
-curl -fsSL https://claude.ai/install.sh | bash || true
+export PATH="$HOME/.local/bin:$HOME/.claude/local:$HOME/.npm-global/bin:$PATH"
+if ! command -v claude >/dev/null 2>&1; then
+  curl -fsSL https://claude.ai/install.sh | bash
+fi
+
+if ! command -v claude >/dev/null 2>&1; then
+  CLAUDE_BIN="$(find "$HOME/.claude" "$HOME/.local/bin" -type f -name claude -perm -u+x 2>/dev/null | head -n 1 || true)"
+  if [ -n "$CLAUDE_BIN" ]; then
+    sudo ln -sf "$CLAUDE_BIN" /usr/local/bin/claude
+  fi
+fi
+
+if ! command -v claude >/dev/null 2>&1; then
+  echo "==> Claude native installer did not expose 'claude' on PATH; trying npm fallback"
+  mkdir -p "$HOME/.npm-global"
+  npm config set prefix "$HOME/.npm-global"
+  npm install -g @anthropic-ai/claude-code
+fi
+
+if ! grep -q 'HOME/.local/bin' "$HOME/.bashrc"; then
+  echo 'export PATH="$HOME/.local/bin:$HOME/.claude/local:$HOME/.npm-global/bin:$PATH"' >> "$HOME/.bashrc"
+fi
+
+claude --version
 
 echo "==> Done. Run 'claude' to start Claude Code, or open any module README to begin."

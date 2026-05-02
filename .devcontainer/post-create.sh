@@ -4,6 +4,9 @@ set -euo pipefail
 echo "==> Installing Python libraries"
 pip install --quiet pandas matplotlib seaborn python-telegram-bot python-dotenv
 
+echo "==> Installing R libraries"
+R --quiet -e "install.packages(c('tidyverse','jsonlite'), repos='https://cloud.r-project.org')" >/dev/null
+
 echo "==> Installing Typst (for standardised PDF reports)"
 curl -fsSL https://github.com/typst/typst/releases/latest/download/typst-x86_64-unknown-linux-musl.tar.xz -o /tmp/typst.tar.xz
 sudo tar -xJf /tmp/typst.tar.xz -C /opt

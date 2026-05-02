@@ -63,8 +63,9 @@ Optional background reading:
 3. If this is your first time, click the **+** button or **Create codespace on main**. If you already see a named Codespace such as `sturdy tribble`, that is an existing workspace; click it only if you want to continue where you previously left off.
 4. Check the billing message. It should show your own GitHub account or your organisation's approved billing account. If it says the instructor's name, stop and ask before creating the Codespace.
 5. Creating a Codespace gives you your own cloud workspace. It does not change the instructor's Codespace or modify the repo's `main` branch by itself.
-6. Wait for the setup to finish. The first launch installs Python libraries, Typst, Bun, and Claude Code.
-   - This can take several minutes. If the terminal says `Running postCreateCommand...`, setup is still running.
+6. Wait for the setup to finish. The first launch installs Python libraries, R libraries, Typst, Bun, and Claude Code.
+   - This can take several minutes, and in some Codespaces it may take around 15 minutes.
+   - If the terminal says `Running postCreateCommand...`, setup is still running.
    - The Explorer panel may show the files before setup has finished. That does not mean Claude Code is ready yet.
    - Do not run `claude` until the setup has finished and you have a normal terminal prompt again.
    - If setup is still printing package-install messages, let it continue.

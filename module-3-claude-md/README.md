@@ -41,11 +41,45 @@ More specific context wins when they conflict. This means you can have a general
 
 Open `module-3-claude-md/CLAUDE.md` (already in this folder). It is a skeleton. Fill in the blanks.
 
+This is a Markdown (`.md`) file. Markdown is plain text with light formatting:
+
+- `#` and `##` make headings.
+- `-` makes bullet points.
+- Backticks mark commands, filenames, or code.
+- `<!-- ... -->` marks a comment. The comments in this file are prompts for you; replace them with your own text.
+
+You do not need a strict syntax for `CLAUDE.md`. Claude reads normal sentences. Headings and bullets just make the context easier to scan. Do not put secrets in comments; comments are still part of the raw file.
+
 The skeleton asks you to describe:
 
 1. **Your role in the club**: analyst? intern? performance scientist? One sentence.
 2. **Your preferred working style**: do you want short summaries or long explanations? Do you want Claude to ask before running destructive commands?
 3. **What "done" looks like** for your version of the report: headline number? Player table? Traffic-light grading?
+
+For example:
+
+```markdown
+## About me
+
+I am a junior performance analyst at Northfield FC. I mostly work with the U23 squad, and I am still learning sport-science terminology, so explain acronyms the first time you use them.
+
+## How I like to receive output
+
+- Start with the answer, then give the reasoning.
+- Keep summaries short enough for a coach to read quickly.
+- Use British English.
+- A little dry humour is fine when we are discussing workflow or mistakes, but keep coach-facing reports professional.
+- Ask before running destructive commands or deleting files.
+- Show me the important code changes before applying them.
+
+## What "done" looks like for this module
+
+Done means I have a cleaning script that can be run again on a messy GPS export, produces a tidy CSV, and prints a short summary showing how many rows were read, written, dropped, and why.
+
+## Any domain quirks specific to this exercise
+
+Northfield uses metres and metres per second. Player IDs should stay in the `NF###` format. If a value looks physically impossible, flag it rather than silently accepting it.
+```
 
 Save the file. Then start a Claude Code session inside this folder:
 

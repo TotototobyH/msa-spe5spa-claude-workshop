@@ -26,7 +26,9 @@ That is the bigger idea behind the workshop. The first version is one small anal
 | 4 | Build a GPS cleaning tool | Turn messy sport data into a deterministic process | Ask Claude to inspect the CSV, agree cleaning rules, review and run the script | `clean_gps.py` and a cleaned GPS CSV | 20 min |
 | 5 | Automate the weekly report | Use a skill and Typst template for repeatable reporting | Invoke the weekly-load-report skill and compile a PDF | A one-page Northfield FC training-load report | 20 min |
 | 6 | Analyst agent on Telegram | Put the report workflow behind a phone chat | Create a bot, configure Claude Code Channels, allowlist yourself, send a CSV | A junior analyst-style agent that returns the report PDF | 20 min |
-| 7 | Multi-agent extension | Separate audiences by bot, context, and skill | Compare load-bot and comms-bot roles, then test a second audience-specific brief | A pattern for coach, S&C, board, or parent-facing analyst agents | 15 min |
+| 7 | Optional multi-agent extension | Separate audiences by bot, context, and skill | Compare load-bot and comms-bot roles, then optionally test a second audience-specific brief | A pattern for coach, S&C, board, or parent-facing analyst agents | Self-guided |
+
+The main workshop ends at Module 6. Module 7 is there if you want to explore the next pattern after class.
 
 ## Why These Tools?
 

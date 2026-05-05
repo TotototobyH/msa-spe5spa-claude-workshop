@@ -113,6 +113,8 @@ Paste your real token in that command. The plugin stores it in Claude Code's loc
 
 Do not paste the token into `README.md`, `CLAUDE.md`, a Python file, or a GitHub issue.
 
+After the token is accepted, Claude Code may say that the allowlist is empty and tell you to pair your Telegram account. That is expected. Do not test the bot yet. First restart Claude Code with the channel enabled.
+
 ## Step 5: Restart With The Telegram Channel Enabled
 
 Exit Claude Code:
@@ -129,15 +131,23 @@ claude --channels plugin:telegram@claude-plugins-official
 
 You should see Claude Code start normally. This session is now listening for Telegram messages from your bot.
 
+Run this from inside the workshop repo, ideally from the `module-6-telegram-bot` folder, so Claude has the Module 6 `CLAUDE.md` context available.
+
 ## Step 6: Pair And Allowlist Yourself
 
-On your phone, open a chat with your new bot and send:
+In Telegram, search for the bot username that BotFather gave you. Open the matching bot. If you see a **Start** button, click it. Then send:
 
 ```text
 hello
 ```
 
 The bot should reply with a short pairing code.
+
+If the bot does not reply, check that Claude Code is running with:
+
+```bash
+claude --channels plugin:telegram@claude-plugins-official
+```
 
 Back in Claude Code, run:
 
@@ -155,24 +165,18 @@ Now lock the bot down so only allowlisted users can talk to it:
 
 This is the security step. Without it, the bot may keep offering pairing codes to people who discover the username.
 
-## Step 7: Give The Bot Its Job
-
-At the Claude Code prompt, send:
-
-```text
-When I send you a GPS CSV through Telegram, clean it using the Module 4 rules, run the weekly-load-report skill, and reply with the PDF plus a short summary for the coach.
-```
-
-Claude should acknowledge the workflow. If it asks for permission to read files or run commands, approve only the actions that match the report workflow.
-
-## Step 8: Test From Your Phone
+## Step 7: Test From Your Phone
 
 In Telegram:
 
-1. Send `hello`.
+1. Send `Please run the Northfield weekly load report for this CSV.`
 2. Send `data/gps_training_messy.csv` as a file attachment. In Codespaces, you can right-click the file and download it to your computer or phone first.
 
 Send the CSV as a file/document, not as pasted text. Telegram messages are not a good place for raw CSV content.
+
+You do not need to brief Claude again if it has loaded this repo's `CLAUDE.md` files. The root `CLAUDE.md` describes the workshop workflow, and this module's `CLAUDE.md` says what to do when a GPS file arrives through Telegram.
+
+If Claude seems unsure, send: `Use the Module 6 CLAUDE.md instructions for Telegram GPS files, then run the weekly-load-report skill.`
 
 The bot should:
 
@@ -220,7 +224,9 @@ Before using this pattern with real athlete data, you would also need:
 
 You have connected a phone chat to a repeatable sport analytics workflow.
 
-Module 7 shows why you might run more than one bot.
+This is the end of the main workshop.
+
+If you want to keep going, Module 7 is an optional self-guided extension. It shows why a club might eventually run more than one analyst bot: one for technical load reports, another for short coach briefings, and others for different audiences.
 
 ```bash
 cd /workspaces/msa-spe5spa-claude-workshop/module-7-multi-bot
